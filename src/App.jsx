@@ -1,18 +1,26 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addPost, fetchPosts, deletePost } from "./utils/utils";
+import { useState } from "react";
 
 function App() {
   const queryClient = useQueryClient();
+
+  const [title, setTitle] = useState("");
+  const [views, setViews] = useState("");
+
   const { data, isLoading, error, isError } = useQuery({
     queryKey: [`posts`],
     queryFn: fetchPosts,
     staleTime: 1000 * 5,
   });
-  const mutation = useMutation({
+
+  const addMutation = useMutation({
     mutationKey: [`post`],
     mutationFn: addPost,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`posts`] });
+      setTitle("");
+      setViews("");
     },
   });
 
@@ -28,6 +36,31 @@ function App() {
 
   return (
     <>
+      <input
+        placeholder="Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+
+      <input
+        placeholder="Views"
+        type="number"
+        value={views}
+        onChange={(e) => setViews(e.target.value)}
+      />
+
+      <button
+        onClick={() =>
+          addMutation.mutate({
+            title,
+            views: Number(views),
+          })
+        }
+        disabled={!title || !views}
+      >
+        Add Post
+      </button>
+
       {data.map((item) => {
         return (
           <div className="post">
@@ -44,7 +77,7 @@ function App() {
         );
       })}
       <button
-        onClick={() => mutation.mutate({ title: "New Title", views: 300 })}
+        onClick={() => addMutation.mutate({ title: "New Title", views: 300 })}
       >
         Add Post
       </button>
