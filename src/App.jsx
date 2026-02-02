@@ -5,8 +5,10 @@ import { useState } from "react";
 function App() {
   const queryClient = useQueryClient();
 
-  const [title, setTitle] = useState("");
-  const [views, setViews] = useState("");
+  const [inputData, setInputData] = useState({
+    title: "",
+    views: "",
+  });
 
   const { data, isLoading, error, isError } = useQuery({
     queryKey: [`posts`],
@@ -19,8 +21,7 @@ function App() {
     mutationFn: addPost,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`posts`] });
-      setTitle("");
-      setViews("");
+      setInputData((prev) => ({ ...prev, title: "", views: "" }));
     },
   });
 
@@ -38,25 +39,29 @@ function App() {
     <>
       <input
         placeholder="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        value={inputData.title}
+        onChange={(e) =>
+          setInputData((prev) => ({ ...prev, title: e.target.value }))
+        }
       />
 
       <input
         placeholder="Views"
         type="number"
-        value={views}
-        onChange={(e) => setViews(e.target.value)}
+        value={inputData.views}
+        onChange={(e) =>
+          setInputData((prev) => ({ ...prev, views: e.target.value }))
+        }
       />
 
       <button
         onClick={() =>
           addMutation.mutate({
-            title,
-            views: Number(views),
+            title: inputData.title,
+            views: Number(inputData.views),
           })
         }
-        disabled={!title || !views}
+        disabled={!inputData.title || !inputData.views}
       >
         Add Post
       </button>
