@@ -33,7 +33,6 @@ function App() {
 
   if (isLoading) return <div>Loading ...</div>;
   if (isError) return <div>{error.message}</div>;
-  if (!data) return <div>No data</div>;
 
   return (
     <>
