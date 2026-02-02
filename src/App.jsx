@@ -1,14 +1,32 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addPost, fetchPosts, deletePost } from "./utils/utils";
-import { useState } from "react";
+import { useReducer } from "react";
+
+const initialState = {
+  title: "",
+  views: "",
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "change_title": {
+      return { ...state, title: action.payload };
+    }
+    case "change_views": {
+      return { ...state, views: Number(action.payload) || "" };
+    }
+    case "clear": {
+      return initialState;
+    }
+    default:
+      return state;
+  }
+};
 
 function App() {
   const queryClient = useQueryClient();
 
-  const [inputData, setInputData] = useState({
-    title: "",
-    views: "",
-  });
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const { data, isLoading, error, isError } = useQuery({
     queryKey: [`posts`],
@@ -17,11 +35,10 @@ function App() {
   });
 
   const addMutation = useMutation({
-    mutationKey: [`post`],
     mutationFn: addPost,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`posts`] });
-      setInputData((prev) => ({ ...prev, title: "", views: "" }));
+      dispatch({ type: "clear" });
     },
   });
 
@@ -39,29 +56,29 @@ function App() {
     <>
       <input
         placeholder="Title"
-        value={inputData.title}
-        onChange={(e) =>
-          setInputData((prev) => ({ ...prev, title: e.target.value }))
-        }
+        value={state.title}
+        onChange={(e) => {
+          dispatch({ type: "change_title", payload: e.target.value });
+        }}
       />
 
       <input
         placeholder="Views"
         type="number"
-        value={inputData.views}
-        onChange={(e) =>
-          setInputData((prev) => ({ ...prev, views: e.target.value }))
-        }
+        value={state.views}
+        onChange={(e) => {
+          dispatch({ type: "change_views", payload: e.target.value });
+        }}
       />
 
       <button
         onClick={() =>
           addMutation.mutate({
-            title: inputData.title,
-            views: Number(inputData.views),
+            title: state.title,
+            views: Number(state.views),
           })
         }
-        disabled={!inputData.title || !inputData.views}
+        disabled={!state.title || !state.views}
       >
         Add Post
       </button>
