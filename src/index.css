@@ -1,5 +1,51 @@
+html,
 body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
   background-color: whitesmoke;
+}
+
+.container {
+  height: 600px;
+  width: 500px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column !important;
+  padding: 30px;
+  border-radius: 10px;
+}
+
+.products-table {
+  width: 100%;
+  /* 🔥 important */
+  border-collapse: collapse;
+  table-layout: fixed;
+  /* keeps columns aligned */
+}
+
+.products-table th,
+.products-table td {
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.products-table th {
+  font-weight: 600;
+}
+
+.search-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
 }
 
 .post {
